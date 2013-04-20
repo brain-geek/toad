@@ -16,7 +16,7 @@ int ToadApplication::exec() {
    if (arguments().length() >= 3)
        processes = arguments().at(2).toInt();
 
-   qDebug()<< QString("Using %1 browsers.").arg(processes);
+   qDebug()<< QString("Using %1 browser(s).").arg(processes);
 
   for (int i= 0;i<processes;i++)
   {
