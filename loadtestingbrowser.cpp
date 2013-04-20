@@ -7,7 +7,7 @@ LoadTestingBrowser::LoadTestingBrowser(QObject *parent) :
     page->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
 
     timer = new QTimer(this);
-    timer->setInterval(10000);
+    timer->setInterval(15000);
     timer->setSingleShot(true);
 
     connect(timer, SIGNAL(timeout()), this, SLOT(restartByTimer()));
