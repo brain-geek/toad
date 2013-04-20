@@ -26,16 +26,17 @@ void LoadTestingBrowser::restartTest(QString error_message = "") {
     timer->start();
 }
 
-void LoadTestingBrowser::startTest(QUrl url, QString should_include) {
+void LoadTestingBrowser::startTest(QUrl url) {
     this->base_url = url;
-    this->url_should_include = should_include;
     page->mainFrame()->load(url);
 }
 
 void LoadTestingBrowser::loadFinished(bool ok) {
-    qDebug() << "Current page: " << page->currentFrame()->title();
+    qDebug() << "Opened page: " << page->currentFrame()->title();
 
-    if (!ok) qDebug() << "its not ok, something wrong happened! URL: "<< page->currentFrame()->baseUrl();
+    if (!ok) {
+        restartTest(QString("its not ok, something wrong happened! (possibly 500) URL: %1").arg(page->currentFrame()->baseUrl().toString()));
+     }
 
     QWebElement document= page->currentFrame()->documentElement();
     QWebElementCollection collection = document.findAll("a[href]");
@@ -45,7 +46,7 @@ void LoadTestingBrowser::loadFinished(bool ok) {
     if (collection.count() == 0)
         restartTest("No links found on page. Restarting.");
 
-    if (!page->currentFrame()->baseUrl().toString().contains(url_should_include))
+    if (page->currentFrame()->baseUrl().host() != base_url.host())
         restartTest("We've got outside the test site. Restarting.");
 
 
@@ -66,13 +67,13 @@ void LoadTestingBrowser::loadFinished(bool ok) {
 }
 
 void LoadTestingBrowser::restartByTimer() {
-    restartTest("Something bad happened in past. We're stuck. Restarting by timer.");
+    restartTest("Restarting by timer.");
 }
 
-void LoadTestingBrowser::loadProgress(int progress) {
+void LoadTestingBrowser::loadProgress(int) {
     timer->start();
 }
 
 void LoadTestingBrowser::linkClicked(const QUrl & url) {
-    restartTest(QString("We've got some problem - unknown page visited! Got link clicked to ").append(url.toString()));
+    restartTest(QString("We've got some problem - unknown link click handled! Link: ").append(url.toString()));
 }

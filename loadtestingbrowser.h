@@ -12,7 +12,7 @@ class LoadTestingBrowser : public QObject
 public:
     explicit LoadTestingBrowser(QObject *parent = 0);
     void setBrowserObject(QWebPage* page);
-    void startTest(QUrl, QString);
+    void startTest(QUrl);
     void restartTest(QString error_message);
     
 signals:
@@ -27,7 +27,6 @@ protected:
     QWebPage* page;
     QTimer* timer;
     QUrl base_url;
-    QString url_should_include;
 };
 
 #endif // LOADTESTINGBROWSER_H

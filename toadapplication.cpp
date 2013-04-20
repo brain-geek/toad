@@ -14,7 +14,7 @@ int ToadApplication::exec() {
 
   LoadTestingBrowser* br = new LoadTestingBrowser(this);
 
-  br->startTest(url, url.host());
+  br->startTest(url);
 
   return QApplication::exec();
 }
