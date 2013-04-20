@@ -12,9 +12,19 @@ int ToadApplication::exec() {
 
   QUrl url = QUrl(arguments().at(1));
 
-  LoadTestingBrowser* br = new LoadTestingBrowser(this);
+  for (int i= 0;i<7;i++)
+  {
+    QThread* t = new QThread;
+    t->start();
 
-  br->startTest(url);
+    LoadTestingBrowser* br = new LoadTestingBrowser();
+    connect(this,SIGNAL(start()), br, SLOT(start()));
+
+    br->setBaseUrl(url);
+    br->moveToThread(t);
+  }
+
+  emit start();
 
   return QApplication::exec();
 }

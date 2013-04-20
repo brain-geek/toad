@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QThread>
 
 class ToadApplication : public QApplication
 {
@@ -12,7 +13,8 @@ public:
     ToadApplication(int &argc, char **& argv);
 
 signals:
-    
+    void start();
+
 public slots:
 
 protected:

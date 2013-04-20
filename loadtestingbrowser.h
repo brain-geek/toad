@@ -12,12 +12,13 @@ class LoadTestingBrowser : public QObject
 public:
     explicit LoadTestingBrowser(QObject *parent = 0);
     void setBrowserObject(QWebPage* page);
-    void startTest(QUrl);
     void restartTest(QString error_message);
+    void setBaseUrl(QUrl);
     
 signals:
     
 public slots:
+    void start();
     void restartByTimer();
     void loadFinished ( bool ok);
     void loadProgress ( int progress);
@@ -26,6 +27,7 @@ public slots:
 protected:
     QWebPage* page;
     QTimer* timer;
+    QElapsedTimer page_load_time;
     QUrl base_url;
 };
 

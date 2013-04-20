@@ -18,24 +18,27 @@ LoadTestingBrowser::LoadTestingBrowser(QObject *parent) :
 }
 
 void LoadTestingBrowser::restartTest(QString error_message = "") {
-    qDebug() << "Restarting at " << QTime::currentTime() << " with message " << error_message;
+    if (error_message.length() > 0)
+        qDebug() << QString("Restarting at %1 with message '%2'.").arg(QTime::currentTime().toString("H:m:s")).arg(error_message);
+    else
+        qDebug() << QString("(RE)Starting at %1").arg(QTime::currentTime().toString("H:m:s"));
 
-    QUrl url(base_url);
-    page->mainFrame()->load(url);
+    page->mainFrame()->load(base_url);
 
     timer->start();
+    page_load_time.start();
 }
 
-void LoadTestingBrowser::startTest(QUrl url) {
+void LoadTestingBrowser::setBaseUrl(QUrl url) {
     this->base_url = url;
-    page->mainFrame()->load(url);
 }
 
 void LoadTestingBrowser::loadFinished(bool ok) {
-    qDebug() << "Opened page: " << page->currentFrame()->title();
+    qDebug() << QString("Thread: %1: Opened page with by URL '%2'. It took %3 miliseconds.").arg(QThread::currentThreadId()).arg(page->currentFrame()->baseUrl().toString()).arg(page_load_time.elapsed());
 
     if (!ok) {
         restartTest(QString("its not ok, something wrong happened! (possibly 500) URL: %1").arg(page->currentFrame()->baseUrl().toString()));
+        return;
      }
 
     QWebElement document= page->currentFrame()->documentElement();
@@ -44,11 +47,16 @@ void LoadTestingBrowser::loadFinished(bool ok) {
     QWebElement link;
 
     if (collection.count() == 0)
+    {
         restartTest("No links found on page. Restarting.");
+        return;
+    }
 
     if (page->currentFrame()->baseUrl().host() != base_url.host())
-        restartTest("We've got outside the test site. Restarting.");
-
+    {
+       restartTest("We've got outside the test site. Restarting.");
+       return;
+    }
 
     QString link_href;
 
@@ -58,12 +66,15 @@ void LoadTestingBrowser::loadFinished(bool ok) {
        link = collection.at(qrand()%collection.count());
        link_href = link.attribute("href");
 
-       qDebug() << "Trying link with href" << link_href;
+//       qDebug() << "Trying link with href" << link_href;
     }
     while ((link_href.count() == 0) || (link_href.at(0) == '#') || (link_href.contains("javascript:;")));
 
-    qDebug() << "Opening link";
+//    qDebug() << "Opening link";
     link.evaluateJavaScript("var evObj = document.createEvent('MouseEvents');evObj.initEvent( 'click', true, true );this.dispatchEvent(evObj);");
+
+    page_load_time.start();
+    timer->start();
 }
 
 void LoadTestingBrowser::restartByTimer() {
@@ -76,4 +87,8 @@ void LoadTestingBrowser::loadProgress(int) {
 
 void LoadTestingBrowser::linkClicked(const QUrl & url) {
     restartTest(QString("We've got some problem - unknown link click handled! Link: ").append(url.toString()));
+}
+
+void LoadTestingBrowser::start() {
+    restartTest();
 }
