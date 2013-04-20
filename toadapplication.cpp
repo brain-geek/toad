@@ -10,18 +10,20 @@ int ToadApplication::exec() {
         return EXIT_FAILURE;
     };
 
-  QUrl url = QUrl(arguments().at(1));
+   QUrl url = QUrl(arguments().at(1));
 
-  for (int i= 0;i<7;i++)
+   int processes = 1;
+   if (arguments().length() >= 3)
+       processes = arguments().at(2).toInt();
+
+   qDebug()<< QString("Using %1 browsers.").arg(processes);
+
+  for (int i= 0;i<processes;i++)
   {
-    QThread* t = new QThread;
-    t->start();
-
     LoadTestingBrowser* br = new LoadTestingBrowser();
     connect(this,SIGNAL(start()), br, SLOT(start()));
 
     br->setBaseUrl(url);
-    br->moveToThread(t);
   }
 
   emit start();
