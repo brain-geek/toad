@@ -1,0 +1,17 @@
+= Toad
+
+      8..8
+     (----)
+    ( >__< )
+     ^^~~^^
+
+Toad is full-stack load website testing app. It runs several headless Webkit browsers simultaneously to achieve this.
+
+Usage example:
+  ./startme.sh -u http://brain-geek.github.com/ -c 10 -p 5
+
+OPTIONS:
+  -h      Show this message
+  -u      URL to start crawling
+  -c      Number of browsers per process (default - 5)
+  -p      Number of processes (default - 1)

@@ -23,4 +23,5 @@ HEADERS += \
     toadapplication.h
 
 OTHER_FILES += \
-    startme.sh
+    startme.sh \
+    README.md
