@@ -21,3 +21,6 @@ SOURCES += main.cpp \
 HEADERS += \
     loadtestingbrowser.h \
     toadapplication.h
+
+OTHER_FILES += \
+    startme.sh
