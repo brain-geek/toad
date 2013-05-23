@@ -8,7 +8,7 @@ class Logger : public QObject
 {
     Q_OBJECT
 public:
-    Logger(QString logging_path);
+    Logger(QString logging_path, QObject* parent = 0);
     void addBrowser(Browser *);
     
 private slots:

@@ -7,7 +7,7 @@ Browser::Browser(QObject *parent) :
     page->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
 
     timeout_countdown = new QTimer(this);
-    timeout_countdown->setInterval(60000);
+    timeout_countdown->setInterval(10000);
     timeout_countdown->setSingleShot(true);
 
     connect(timeout_countdown, SIGNAL(timeout()), this, SLOT(restartByTimer()));
@@ -23,6 +23,7 @@ void Browser::restartTest(QString error_message = "") {
     else
         qDebug() << this << QString("Starting at %1").arg(QTime::currentTime().toString("H:m:s"));
 
+    this->last_url = QUrl("http://non-existant");
     page->mainFrame()->load(base_url);
 
     timeout_countdown->start();
@@ -34,7 +35,18 @@ void Browser::setBaseUrl(QUrl url) {
 }
 
 void Browser::loadFinished(bool ok) {
-    qDebug() << this << QString("%1, '%2', %3 ms.").arg(QDateTime::currentDateTime().toTime_t()).arg(page->currentFrame()->baseUrl().toString()).arg(page_load_time.elapsed());
+    QUrl current_url(page->currentFrame()->baseUrl());
+
+    // events trottling
+    if (current_url == this->last_url)
+    {
+        qDebug() << this << QString("%1, loadFinished trottled.").arg(QDateTime::currentDateTime().toTime_t());
+        return;
+    }
+
+    this->last_url = current_url;
+
+    qDebug() << this << QString("%1, '%2', %3 ms.").arg(QDateTime::currentDateTime().toTime_t()).arg(current_url.toString()).arg(page_load_time.elapsed());
 
     if (!ok) {
         emit(errorHappened(page_load_time.elapsed(), page->currentFrame()->baseUrl()));

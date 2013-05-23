@@ -17,7 +17,7 @@ int ToadApplication::exec() {
    Logger* logger;
 
    if (arguments().length() >= 4)
-       logger = new Logger(arguments().at(3));
+       logger = new Logger(arguments().at(3), this);
 
    url = QUrl(arguments().at(1));
 

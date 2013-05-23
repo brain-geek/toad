@@ -1,7 +1,7 @@
 #include "logger.h"
 
-Logger::Logger(QString logging_path) :
-    QObject(br)
+Logger::Logger(QString logging_path, QObject *parent) :
+    QObject(parent)
 {
     this->log_file = new QFile(logging_path);
     this->file_opened = this->log_file->open(QFile::WriteOnly);

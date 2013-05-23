@@ -31,6 +31,8 @@ protected:
     QTimer* timeout_countdown;
     QElapsedTimer page_load_time;
     QUrl base_url;
+
+    QUrl last_url;
 };
 
 #endif // LOADTESTINGBROWSER_H
