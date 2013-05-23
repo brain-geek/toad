@@ -1,16 +1,25 @@
 #include "toadapplication.h"
 #include "loadtestingbrowser.h"
+#include "logger.h"
 
 ToadApplication::ToadApplication(int &argc, char **&argv): QApplication(argc, argv){
 };
 
 int ToadApplication::exec() {
-    if (arguments().length() < 2) {
-        qDebug() << "Wrong arguments received! I expect one arguments - URL to start crawling.";
-        return EXIT_FAILURE;
-    };
+   if (arguments().length() < 2) {
+       qDebug() << "Wrong arguments received! I expect first argument - URL to start crawling, optional second - number of browsers in this thread. And optional third - path to file to log data.";
+       return EXIT_FAILURE;
+   };
 
-   QUrl url = QUrl(arguments().at(1));
+   QUrl url;
+
+   LoadTestingBrowser* br;
+   Logger* logger;
+
+   if (arguments().length() >= 4)
+       logger = new Logger(arguments().at(3));
+
+   url = QUrl(arguments().at(1));
 
    int processes = 1;
    if (arguments().length() >= 3)
@@ -20,8 +29,11 @@ int ToadApplication::exec() {
 
   for (int i= 0;i<processes;i++)
   {
-    LoadTestingBrowser* br = new LoadTestingBrowser();
+    br = new LoadTestingBrowser(this);
     connect(this,SIGNAL(start()), br, SLOT(start()));
+
+    if (arguments().length() >= 4)
+        logger->addBrowser(br);
 
     br->setBaseUrl(url);
   }

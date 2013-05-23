@@ -18,14 +18,16 @@ OPTIONS:
    -u      URL to start crawling
    -c      Number of browsers per process (default - 5)
    -p      Number of processes (default - 1)
+   -o      Directory for logs (default - logs disabled)
 EOF
 }
 
 URL=
 CONCURRENCY=5
 PROCESSES=1
+LOG_DIR=
 
-while getopts “hc:p:u:” OPTION
+while getopts “hc:p:u:o:” OPTION
 do
      case $OPTION in
          h)
@@ -41,6 +43,9 @@ do
          p)
              PROCESSES=$OPTARG
              ;;
+         o)
+             LOG_DIR=$OPTARG
+             ;;
          ?)
              usage
              exit
@@ -54,13 +59,26 @@ then
      exit 1
 fi
 
+if [[ $LOG_DIR ]]; then
+  mkdir -p $(dirname $LOG_DIR)
+fi
+
 trap "killall toad" EXIT
 
 #starting PROCESSES - 1 toads in background!
 let PROCESSES--
 
 for i in $(seq $PROCESSES); do
-   ./toad $URL $CONCURRENCY &
+  if [[ $LOG_DIR ]]; then
+     ./toad $URL $CONCURRENCY $LOG_DIR $LOG_DIR-$i &
+     echo "toad cmd: ./toad $URL $CONCURRENCY $LOG_DIR $LOG_DIR-$i "
+  else
+     ./toad $URL $CONCURRENCY &
+  fi
 done
 
-./toad $URL $CONCURRENCY
+if [[ $LOG_DIR ]]; then
+   ./toad $URL $CONCURRENCY $LOG_DIR-0
+else
+   ./toad $URL $CONCURRENCY
+fi

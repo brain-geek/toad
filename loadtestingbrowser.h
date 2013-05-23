@@ -16,6 +16,8 @@ public:
     void setBaseUrl(QUrl);
     
 signals:
+    void pageLoaded(qint64 msecs_loaded, QUrl page_url);
+    void errorHappened(qint64 msecs_loaded, QUrl page_url);
     
 public slots:
     void start();
@@ -26,7 +28,7 @@ public slots:
 
 protected:
     QWebPage* page;
-    QTimer* timer;
+    QTimer* timeout_countdown;
     QElapsedTimer page_load_time;
     QUrl base_url;
 };

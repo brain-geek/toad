@@ -6,11 +6,11 @@ LoadTestingBrowser::LoadTestingBrowser(QObject *parent) :
     page = new QWebPage(this);
     page->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
 
-    timer = new QTimer(this);
-    timer->setInterval(15000);
-    timer->setSingleShot(true);
+    timeout_countdown = new QTimer(this);
+    timeout_countdown->setInterval(60000);
+    timeout_countdown->setSingleShot(true);
 
-    connect(timer, SIGNAL(timeout()), this, SLOT(restartByTimer()));
+    connect(timeout_countdown, SIGNAL(timeout()), this, SLOT(restartByTimer()));
 
     connect(page, SIGNAL(loadFinished(bool)),this, SLOT(loadFinished(bool)));
     connect(page, SIGNAL(loadProgress(int)),this, SLOT(loadProgress(int)));
@@ -25,7 +25,7 @@ void LoadTestingBrowser::restartTest(QString error_message = "") {
 
     page->mainFrame()->load(base_url);
 
-    timer->start();
+    timeout_countdown->start();
     page_load_time.start();
 }
 
@@ -37,20 +37,12 @@ void LoadTestingBrowser::loadFinished(bool ok) {
     qDebug() << QString("Thread: %1: Opened page with by URL '%2'. It took %3 miliseconds.").arg(QThread::currentThreadId()).arg(page->currentFrame()->baseUrl().toString()).arg(page_load_time.elapsed());
 
     if (!ok) {
+        emit(errorHappened(page_load_time.elapsed(), page->currentFrame()->baseUrl()));
         restartTest(QString("its not ok, something wrong happened! (possibly 500) URL: %1").arg(page->currentFrame()->baseUrl().toString()));
         return;
      }
 
     QWebElement document= page->currentFrame()->documentElement();
-    QWebElementCollection collection = document.findAll("a[href]");
-
-    QWebElement link;
-
-    if (collection.count() == 0)
-    {
-        restartTest("No links found on page. Restarting.");
-        return;
-    }
 
     if (page->currentFrame()->baseUrl().host() != base_url.host())
     {
@@ -58,31 +50,38 @@ void LoadTestingBrowser::loadFinished(bool ok) {
        return;
     }
 
-    QString link_href;
+    emit(pageLoaded(page_load_time.elapsed(), page->currentFrame()->baseUrl()));
+
+    QWebElementCollection collection = document.findAll("a[href]");
+    QWebElement link; QString link_href;
+
+    if (collection.count() == 0)
+    {
+        restartTest("No links found on page. Restarting.");
+        return;
+    }
 
     // Ignoring javascript and empty links
     do
     {
        link = collection.at(qrand()%collection.count());
        link_href = link.attribute("href");
-
-//       qDebug() << "Trying link with href" << link_href;
     }
     while ((link_href.count() == 0) || (link_href.at(0) == '#') || (link_href.contains("javascript:;")));
 
-//    qDebug() << "Opening link";
     link.evaluateJavaScript("var evObj = document.createEvent('MouseEvents');evObj.initEvent( 'click', true, true );this.dispatchEvent(evObj);");
 
     page_load_time.start();
-    timer->start();
+    timeout_countdown->start();
 }
 
 void LoadTestingBrowser::restartByTimer() {
     restartTest("Restarting by timer.");
 }
 
-void LoadTestingBrowser::loadProgress(int) {
-    timer->start();
+void LoadTestingBrowser::loadProgress(int progress) {
+    qDebug() << "Progress:" << progress;
+    timeout_countdown->start();
 }
 
 void LoadTestingBrowser::linkClicked(const QUrl & url) {
