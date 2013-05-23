@@ -70,8 +70,8 @@ let PROCESSES--
 
 for i in $(seq $PROCESSES); do
   if [[ $LOG_DIR ]]; then
-     ./toad $URL $CONCURRENCY $LOG_DIR $LOG_DIR-$i &
-     echo "toad cmd: ./toad $URL $CONCURRENCY $LOG_DIR $LOG_DIR-$i "
+     ./toad $URL $CONCURRENCY $LOG_DIR-$i &
+     echo "toad cmd: ./toad $URL $CONCURRENCY $LOG_DIR-$i "
   else
      ./toad $URL $CONCURRENCY &
   fi
