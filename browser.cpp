@@ -1,6 +1,6 @@
-#include "loadtestingbrowser.h"
+#include "browser.h"
 
-LoadTestingBrowser::LoadTestingBrowser(QObject *parent) :
+Browser::Browser(QObject *parent) :
     QObject(parent)
 {
     page = new QWebPage(this);
@@ -17,11 +17,11 @@ LoadTestingBrowser::LoadTestingBrowser(QObject *parent) :
     connect(page, SIGNAL(linkClicked(const QUrl&)),this, SLOT(linkClicked(const QUrl&)));
 }
 
-void LoadTestingBrowser::restartTest(QString error_message = "") {
+void Browser::restartTest(QString error_message = "") {
     if (error_message.length() > 0)
-        qDebug() << QString("Restarting at %1 with message '%2'.").arg(QTime::currentTime().toString("H:m:s")).arg(error_message);
+        qDebug() << this << QString("Restarting at %1 with message '%2'.").arg(QTime::currentTime().toString("H:m:s")).arg(error_message);
     else
-        qDebug() << QString("(RE)Starting at %1").arg(QTime::currentTime().toString("H:m:s"));
+        qDebug() << this << QString("Starting at %1").arg(QTime::currentTime().toString("H:m:s"));
 
     page->mainFrame()->load(base_url);
 
@@ -29,12 +29,12 @@ void LoadTestingBrowser::restartTest(QString error_message = "") {
     page_load_time.start();
 }
 
-void LoadTestingBrowser::setBaseUrl(QUrl url) {
+void Browser::setBaseUrl(QUrl url) {
     this->base_url = url;
 }
 
-void LoadTestingBrowser::loadFinished(bool ok) {
-    qDebug() << QString("Thread: %1: Opened page with by URL '%2'. It took %3 miliseconds.").arg(QThread::currentThreadId()).arg(page->currentFrame()->baseUrl().toString()).arg(page_load_time.elapsed());
+void Browser::loadFinished(bool ok) {
+    qDebug() << this << QString("%1, '%2', %3 ms.").arg(QDateTime::currentDateTime().toTime_t()).arg(page->currentFrame()->baseUrl().toString()).arg(page_load_time.elapsed());
 
     if (!ok) {
         emit(errorHappened(page_load_time.elapsed(), page->currentFrame()->baseUrl()));
@@ -75,19 +75,18 @@ void LoadTestingBrowser::loadFinished(bool ok) {
     timeout_countdown->start();
 }
 
-void LoadTestingBrowser::restartByTimer() {
+void Browser::restartByTimer() {
     restartTest("Restarting by timer.");
 }
 
-void LoadTestingBrowser::loadProgress(int progress) {
-    qDebug() << "Progress:" << progress;
+void Browser::loadProgress(int) {
     timeout_countdown->start();
 }
 
-void LoadTestingBrowser::linkClicked(const QUrl & url) {
+void Browser::linkClicked(const QUrl & url) {
     restartTest(QString("We've got some problem - unknown link click handled! Link: ").append(url.toString()));
 }
 
-void LoadTestingBrowser::start() {
+void Browser::start() {
     restartTest();
 }

@@ -15,14 +15,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    loadtestingbrowser.cpp \
     toadapplication.cpp \
-    logger.cpp
+    logger.cpp \
+    browser.cpp
 
 HEADERS += \
-    loadtestingbrowser.h \
     toadapplication.h \
-    logger.h
+    logger.h \
+    browser.h
 
 OTHER_FILES += \
     startme.sh \

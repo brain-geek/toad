@@ -6,11 +6,11 @@
 #include <QWebElementCollection>
 #include <QTimer>
 
-class LoadTestingBrowser : public QObject
+class Browser : public QObject
 {
     Q_OBJECT
 public:
-    explicit LoadTestingBrowser(QObject *parent = 0);
+    explicit Browser(QObject *parent = 0);
     void setBrowserObject(QWebPage* page);
     void restartTest(QString error_message);
     void setBaseUrl(QUrl);

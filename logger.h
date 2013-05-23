@@ -2,14 +2,14 @@
 #define LOGGER_H
 
 #include <QObject>
-#include "loadtestingbrowser.h"
+#include "browser.h"
 
 class Logger : public QObject
 {
     Q_OBJECT
 public:
     Logger(QString logging_path);
-    void addBrowser(LoadTestingBrowser *);
+    void addBrowser(Browser *);
     
 private slots:
     void pageLoaded(qint64 msecs_loaded, QUrl page_url);
@@ -18,7 +18,7 @@ private slots:
 protected:
     QFile* log_file;
     bool file_opened;
-    LoadTestingBrowser* br;
+    Browser* br;
 };
 
 #endif // LOGGER_H

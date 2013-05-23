@@ -1,4 +1,3 @@
-#include "loadtestingbrowser.h"
 #include "toadapplication.h"
 
 int main(int argc, char *argv[])

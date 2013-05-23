@@ -1,5 +1,5 @@
 #include "toadapplication.h"
-#include "loadtestingbrowser.h"
+#include "browser.h"
 #include "logger.h"
 
 ToadApplication::ToadApplication(int &argc, char **&argv): QApplication(argc, argv){
@@ -13,7 +13,7 @@ int ToadApplication::exec() {
 
    QUrl url;
 
-   LoadTestingBrowser* br;
+   Browser* br;
    Logger* logger;
 
    if (arguments().length() >= 4)
@@ -29,7 +29,7 @@ int ToadApplication::exec() {
 
   for (int i= 0;i<processes;i++)
   {
-    br = new LoadTestingBrowser(this);
+    br = new Browser(this);
     connect(this,SIGNAL(start()), br, SLOT(start()));
 
     if (arguments().length() >= 4)

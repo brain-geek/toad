@@ -15,7 +15,7 @@ Logger::Logger(QString logging_path) :
     }
 }
 
-void Logger::addBrowser(LoadTestingBrowser * br) {
+void Logger::addBrowser(Browser * br) {
     connect(br, SIGNAL(pageLoaded(qint64, QUrl)), this, SLOT(pageLoaded(qint64,QUrl)));
 }
 
