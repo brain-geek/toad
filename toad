@@ -26,6 +26,7 @@ URL=
 CONCURRENCY=5
 PROCESSES=1
 LOG_DIR=
+TOAD_PATH=./toad-bin
 
 while getopts “hc:p:u:o:” OPTION
 do
@@ -46,12 +47,17 @@ do
          o)
              LOG_DIR=$OPTARG
              ;;
+         b)
+             TOAD_PATH=$OPTARG
+             ;;
          ?)
              usage
              exit
              ;;
      esac
 done
+
+TOAD_BNAME=$(basename $TOAD_PATH)
 
 if [[ -z $URL ]]
 then
@@ -63,22 +69,23 @@ if [[ $LOG_DIR ]]; then
   mkdir -p $(dirname $LOG_DIR)
 fi
 
-trap "killall toad" EXIT
+trap "killall $TOAD_BNAME" EXIT
 
 #starting PROCESSES - 1 toads in background!
 let PROCESSES--
 
 for i in $(seq $PROCESSES); do
   if [[ $LOG_DIR ]]; then
-     ./toad $URL $CONCURRENCY $LOG_DIR-$i &
-     echo "toad cmd: ./toad $URL $CONCURRENCY $LOG_DIR-$i "
+     $TOAD_PATH $URL $CONCURRENCY $LOG_DIR-$i &
   else
-     ./toad $URL $CONCURRENCY &
+     $TOAD_PATH $URL $CONCURRENCY &
   fi
 done
 
 if [[ $LOG_DIR ]]; then
-   ./toad $URL $CONCURRENCY $LOG_DIR-0
+   $TOAD_PATH $URL $CONCURRENCY $LOG_DIR-0
 else
-   ./toad $URL $CONCURRENCY
+   $TOAD_PATH $URL $CONCURRENCY
 fi
+
+killall $TOAD_BNAME

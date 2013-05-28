@@ -7,7 +7,7 @@
 QT       += core
 QT       += webkit
 
-TARGET = toad
+TARGET = toad-bin
 CONFIG   += console
 CONFIG   -= app_bundle
 

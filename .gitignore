@@ -20,5 +20,5 @@ Makefile
 *-build-*
 
 #Project-specific: binaries
-/toad
+/toad-bin
 /toad_log*
