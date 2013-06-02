@@ -1,5 +1,5 @@
 #!/bin/bash
-# Arguments = -u http://brain-geek.github.com/ -c 10 -v
+# Arguments = -u http://brain-geek.github.com/ -c 10 -p 3
 
 usage()
 {
@@ -19,6 +19,7 @@ OPTIONS:
    -c      Number of browsers per process (default - 5)
    -p      Number of processes (default - 1)
    -o      Directory for logs (default - logs disabled)
+   -t      Load for period of time, seconds (default - no limit)
 EOF
 }
 
@@ -27,8 +28,9 @@ CONCURRENCY=5
 PROCESSES=1
 LOG_DIR=
 TOAD_PATH=./toad-bin
+TIMER=0
 
-while getopts “hc:p:u:o:” OPTION
+while getopts “hc:p:u:o:t:” OPTION
 do
      case $OPTION in
          h)
@@ -50,6 +52,9 @@ do
          b)
              TOAD_PATH=$OPTARG
              ;;
+         t)
+             TIMER=$OPTARG
+             ;;
          ?)
              usage
              exit
@@ -69,23 +74,21 @@ if [[ $LOG_DIR ]]; then
   mkdir -p $(dirname $LOG_DIR)
 fi
 
-trap "killall $TOAD_BNAME" EXIT
-
 #starting PROCESSES - 1 toads in background!
 let PROCESSES--
 
 for i in $(seq $PROCESSES); do
   if [[ $LOG_DIR ]]; then
-     $TOAD_PATH $URL $CONCURRENCY $LOG_DIR-$i &
+     $TOAD_PATH $URL $CONCURRENCY $TIMER $LOG_DIR-$i &
   else
-     $TOAD_PATH $URL $CONCURRENCY &
+     $TOAD_PATH $URL $CONCURRENCY $TIMER &
   fi
 done
 
 if [[ $LOG_DIR ]]; then
-   $TOAD_PATH $URL $CONCURRENCY $LOG_DIR-0
+   $TOAD_PATH $URL $CONCURRENCY $TIMER $LOG_DIR-0
 else
-   $TOAD_PATH $URL $CONCURRENCY
+   $TOAD_PATH $URL $CONCURRENCY $TIMER
 fi
 
 killall $TOAD_BNAME

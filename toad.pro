@@ -26,4 +26,5 @@ HEADERS += \
 
 OTHER_FILES += \
     startme.sh \
-    README.md
+    README.md \
+    toad
