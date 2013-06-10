@@ -62,7 +62,6 @@ void Browser::loadFinished(bool ok) {
        return;
     }
 
-    emit(pageLoaded(page_load_time.elapsed(), page->currentFrame()->baseUrl()));
 
     QWebElementCollection collection = document.findAll("a[href]");
     QWebElement link; QString link_href;
@@ -80,6 +79,8 @@ void Browser::loadFinished(bool ok) {
        link_href = link.attribute("href");
     }
     while ((link_href.count() == 0) || (link_href.at(0) == '#') || (link_href.contains("javascript:;")));
+
+    emit(pageLoaded(page_load_time.elapsed(), page->currentFrame()->baseUrl()));
 
     link.evaluateJavaScript("var evObj = document.createEvent('MouseEvents');evObj.initEvent( 'click', true, true );this.dispatchEvent(evObj);");
 
