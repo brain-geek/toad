@@ -8,7 +8,7 @@ Logger::Logger(QString logging_path, QObject *parent) :
 
     if (this->file_opened) {
         QTextStream stream(this->log_file);
-        stream << "Msecs taken to process request;URL" << endl;
+        stream << "Timestamp;Msecs taken to process request;URL" << endl;
     } else
     {
         qDebug() << "Unable to use logger!";
@@ -21,7 +21,7 @@ void Logger::addBrowser(Browser * br) {
 
 void Logger::pageLoaded(qint64 msecs_loaded, QUrl page_url) {
     QTextStream stream(this->log_file);
-    stream << msecs_loaded << ";" << page_url.toString() << endl;
+    stream << QDateTime::currentDateTimeUtc().toTime_t() << ";" << msecs_loaded << ";" << page_url.toString() << endl;
 }
 
 void Logger::errorHappened(qint64, QUrl) { }
